@@ -6,7 +6,10 @@ from helpers.charts import (
     plot_last_24_hours,
     plot_last_30_days,
     plot_last_year,
-    plot_current
+    plot_current,
+    plot_last_24_hours_gas,
+    plot_last_30_days_gas,
+    plot_last_year_gas,
 )
 from config import DEBUG_MODE
 
@@ -58,6 +61,45 @@ def serve_layout():
                 dbc.Card(dbc.CardBody(dcc.Graph(
                     id='last-365-days',
                     figure=plot_last_year(data['month']),
+                    config={
+                        'displayModeBar': False
+                    }
+                )))
+            ])
+        ]),
+    html.Br(),
+        dbc.Row([
+            dbc.Col([
+                dbc.Card(dbc.CardBody(
+                    dbc.Tabs([
+                        dbc.Tab(label='24 Hours Gas', children=[
+                            dcc.Graph(
+                                id='last-24-hours-gas',
+                                figure=plot_last_24_hours_gas(data['hourGas']),
+                                config={
+                                    'displayModeBar': False
+                                }
+                            ),
+                        ]),
+                        dbc.Tab(label='30 Days Gas', children=[
+                            dcc.Graph(
+                                id='last-30-days-gas',
+                                figure=plot_last_30_days_gas(data['dayGas']),
+                                config={
+                                    'displayModeBar': False
+                                }
+                            ),
+                        ])
+                    ])
+                )), 
+            ])
+        ]),
+        html.Br(),
+        dbc.Row([
+            dbc.Col([
+                dbc.Card(dbc.CardBody(dcc.Graph(
+                    id='last-365-days-gas',
+                    figure=plot_last_year_gas(data['monthGas']),
                     config={
                         'displayModeBar': False
                     }
