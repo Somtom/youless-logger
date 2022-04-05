@@ -10,9 +10,11 @@ logger = logging.getLogger('youless')
 
 
 GRANULARITY_MAP = {
-    'minute': {'param': 'h', 'reports': 20, 'table': 'youless_minute'},
-    'hour': {'param': 'd', 'reports': 70, 'table': 'youless_hour'},
-    'day': {'param': 'm', 'reports': 12, 'table': 'youless_day'}
+    'minute': {'ener': 'V?', 'param': 'h', 'reports': 20, 'table': 'youless_minute'},
+    'hour': {'ener': 'V?', 'param': 'd', 'reports': 70, 'table': 'youless_hour'},
+    'day': {'ener': 'V?', 'param': 'm', 'reports': 12, 'table': 'youless_day'},
+    'hourGas': {'ener': 'W?', 'param': 'd', 'reports': 70, 'table': 'youless_hour_gas'},
+    'dayGas': {'ener': 'W?', 'param': 'm', 'reports': 12, 'table': 'youless_day_gas'}
 }
 
 def convert_data(data):
@@ -32,13 +34,15 @@ def convert_data(data):
 
 
 def fetch_data(granularity):
+    ener = GRANULARITY_MAP[granularity]['ener']
     param = GRANULARITY_MAP[granularity]['param']
     reports = GRANULARITY_MAP[granularity]['reports']
 
     logger.info('Fetching new data. Granularity: {}, reports: {}'.format(granularity, reports))
     res = []
     for i in range(reports):
-        data = requests.get('http://youless/V?{param}={page}&f=j'.format(
+        data = requests.get('http://youless/{ener}{param}={page}&f=j'.format(
+            ener=ener,
             param=param,
             page=i+1
         )).json()
@@ -122,5 +126,13 @@ if __name__ == '__main__':
         store_data(df, con)
 
         granularity = 'day'
+        df = fetch_data(granularity)
+        store_data(df, con)
+        
+        granularity = 'hourGas'
+        df = fetch_data(granularity)
+        store_data(df, con)
+
+        granularity = 'dayGas'
         df = fetch_data(granularity)
         store_data(df, con)
